@@ -12,6 +12,6 @@
   "impl-week": {
     "label": "Implantation week (pregnancy hormones graph)",
     "img": "preg_hcg",
-    "zones": [[0.175, 0.02, 0.225, 0.62]]
+    "zones": [[0.1676, 0.0027, 0.2485, 0.6598]]
   }
 }
