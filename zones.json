@@ -7,7 +7,7 @@
   "bleed-day": {
     "label": "Start of menstrual bleed (progesterone / LH graph)",
     "img": "cycle",
-    "zones": [[0.62, 0.02, 0.69, 0.9]]
+    "zones": [[0.6049, 0.0132, 0.673, 1]]
   },
   "impl-week": {
     "label": "Implantation week (pregnancy hormones graph)",
