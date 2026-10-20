@@ -336,7 +336,7 @@ let run=null;
 function start(){
   app.innerHTML=`<div class="start"><p>This quiz has <b>${BANK.length} questions</b> and takes about 10 to 15 minutes. Questions appear in a random order.</p>
   <ul><li>Select <b>Check answer</b> to see whether you are correct. The correct answer and an explanation are then shown.</li>
-  <li>If you are not fully correct, you may choose <b>Try again</b>. Your score is based on your <b>first attempt</b> only.</li>
+  <li>If you are not fully correct, you must choose <b>Try again</b> and reattempt the question before moving on. Your score is based on your <b>first attempt</b> only.</li>
   <li>Some questions give part marks.</li></ul>
   <div class="actions"><button class="btn" id="go">Begin</button></div></div>`;
   document.getElementById('go').onclick=()=>{run={order:shuffle(BANK),i:0,res:[]};show();};
@@ -369,10 +369,12 @@ function show(){
     document.getElementById('ex').textContent=q.expl;
     chk.remove();
     const acts=document.querySelector('.actions');
-    if(m<q.marks){const r=el('button','btn alt','Try again');r.onclick=()=>show.retry();acts.appendChild(r);}
-    const last=run.i===run.order.length-1;
-    const n=el('button','btn',last?'Finish':'Next question');n.onclick=()=>{if(last)finish();else{run.i++;show();}};acts.appendChild(n);
-    n.focus();
+    const mustRetry=m<q.marks&&run.res[run.i].tries<2;
+    if(m<q.marks){const r=el('button',mustRetry?'btn':'btn alt','Try again');r.onclick=()=>show.retry();acts.appendChild(r);r.focus();}
+    if(mustRetry){document.querySelector('.fb').insertAdjacentHTML('beforeend','<p><b>You must reattempt this question before moving on.</b></p>');}
+    else{const last=run.i===run.order.length-1;
+      const n=el('button','btn',last?'Finish':'Next question');n.onclick=()=>{if(last)finish();else{run.i++;show();}};acts.appendChild(n);
+      if(m===q.marks)n.focus();}
   };
   show.retry=()=>{
     const keep=run.res[run.i];show();
