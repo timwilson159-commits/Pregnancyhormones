@@ -1,0 +1,17 @@
+{
+  "impl-diagram": {
+    "label": "Implantation site (reproductive system diagram)",
+    "img": "repro",
+    "zones": [[0.42, 0.16, 0.56, 0.52]]
+  },
+  "bleed-day": {
+    "label": "Start of menstrual bleed (progesterone / LH graph)",
+    "img": "cycle",
+    "zones": [[0.62, 0.02, 0.69, 0.9]]
+  },
+  "impl-week": {
+    "label": "Implantation week (pregnancy hormones graph)",
+    "img": "preg_hcg",
+    "zones": [[0.175, 0.02, 0.225, 0.62]]
+  }
+}

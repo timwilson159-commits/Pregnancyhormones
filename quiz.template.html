@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pregnancy Hormones Quiz</title>
+<style>
+:root{--ink:#111;--mute:#555;--line:#222;--soft:#f4f4f4;--ok:#1d6b2f;--okbg:#e9f5ec;--bad:#a1241c;--badbg:#fbeceb;--part:#8a5a00;--partbg:#fdf4e1}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--ink);font:16px/1.5 Arial,Helvetica,sans-serif}
+.wrap{max-width:820px;margin:0 auto;padding:0 20px 60px}
+header.top{border-bottom:3px solid var(--ink);padding:22px 0 12px;margin-bottom:6px}
+header.top .school{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+header.top h1{margin:4px 0 0;font:700 26px/1.2 Arial,Helvetica,sans-serif}
+.meta{display:flex;justify-content:space-between;font-size:14px;color:var(--mute);padding:8px 0;border-bottom:1px solid #ccc;margin-bottom:22px}
+.bar{height:4px;background:#ddd;margin:-22px 0 22px}
+.bar i{display:block;height:100%;width:0;background:var(--ink);transition:width .3s}
+.qhead{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--ink);padding-bottom:4px;margin-bottom:14px}
+.qhead b{font-size:18px}
+.qhead span{font-size:14px;color:var(--mute)}
+.prompt{margin:0 0 14px}
+.type{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin-bottom:6px}
+figure{margin:0 0 16px;border:1px solid var(--line);padding:10px;text-align:center;background:#fff}
+figure img{max-width:100%;height:auto;display:block;margin:0 auto}
+figcaption{font-size:13px;color:var(--mute);margin-top:6px}
+.stage{position:relative;display:inline-block;max-width:100%;line-height:0}
+.stage.pick{cursor:crosshair}
+.stage img{max-width:100%;max-height:430px;width:auto;height:auto}
+.zone{position:absolute;border:2px solid var(--ok);background:rgba(29,107,47,.18);pointer-events:none}
+.pin{position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;pointer-events:none}
+.pin:before,.pin:after{content:"";position:absolute;background:var(--bad)}
+.pin:before{left:10px;top:0;width:2px;height:22px}
+.pin:after{top:10px;left:0;height:2px;width:22px}
+.pin i{position:absolute;inset:4px;border:2px solid var(--bad);border-radius:50%}
+.pin.ok:before,.pin.ok:after{background:var(--ok)}.pin.ok i{border-color:var(--ok)}
+.opts{display:grid;gap:8px}
+.opt{display:flex;gap:10px;text-align:left;width:100%;background:#fff;border:1px solid var(--line);padding:9px 12px;font:inherit;color:inherit;cursor:pointer}
+.opt:hover:not(:disabled){background:var(--soft)}
+.opt b{min-width:20px}
+.opt.sel{background:#e8e8e8;box-shadow:inset 0 0 0 2px var(--ink)}
+.opt.right{background:var(--okbg);border-color:var(--ok);box-shadow:inset 0 0 0 2px var(--ok)}
+.opt.wrong{background:var(--badbg);border-color:var(--bad);box-shadow:inset 0 0 0 2px var(--bad)}
+.opt:disabled{cursor:default}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 4px;padding:10px;border:1px dashed #888;min-height:50px;background:var(--soft)}
+.chip{font:inherit;border:1px solid var(--line);background:#fff;padding:5px 12px;cursor:grab;color:inherit}
+.chip.used{visibility:hidden}
+.chip:disabled{cursor:default}
+.blank{display:inline-block;min-width:130px;border-bottom:2px solid var(--ink);padding:0 8px;margin:0 3px;text-align:center;cursor:pointer;background:#fafafa;min-height:28px;line-height:26px;vertical-align:bottom}
+.blank.sel{background:#e8e8e8;outline:2px solid var(--ink)}
+.blank.right{background:var(--okbg);border-color:var(--ok);color:var(--ok);font-weight:700}
+.blank.wrong{background:var(--badbg);border-color:var(--bad);color:var(--bad)}
+.fillp{line-height:2.2;margin-bottom:6px}
+table.match{border-collapse:collapse;width:100%}
+table.match td{border:1px solid var(--line);padding:8px 10px;vertical-align:middle}
+table.match td.k{width:28%;font-weight:700;background:var(--soft)}
+.slot{min-height:40px;padding:6px 8px;cursor:pointer;border:1px dashed #888;background:#fafafa;color:var(--mute)}
+.slot.full{border-style:solid;color:var(--ink);background:#fff}
+.slot.sel{outline:2px solid var(--ink)}
+.slot.right{background:var(--okbg);border:1px solid var(--ok)}
+.slot.wrong{background:var(--badbg);border:1px solid var(--bad)}
+.chips.col .chip{text-align:left;width:100%}
+.orderlist{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.orderlist li{display:flex;align-items:center;gap:10px;border:1px solid var(--line);padding:8px 10px;background:#fff;cursor:grab}
+.orderlist li .n{font-weight:700;width:20px}
+.orderlist li .t{flex:1}
+.orderlist li button{font:inherit;border:1px solid var(--line);background:#fff;padding:1px 9px;cursor:pointer}
+.orderlist li.over{outline:2px dashed var(--ink)}
+.orderlist li.right{background:var(--okbg);border-color:var(--ok)}
+.orderlist li.wrong{background:var(--badbg);border-color:var(--bad)}
+input.typed{font:inherit;border:1px solid var(--line);padding:8px 12px;width:260px;max-width:100%}
+.hint{font-size:13px;color:var(--mute);margin-top:8px}
+.fb{margin-top:18px;padding:12px 14px;border-left:5px solid var(--line);background:var(--soft)}
+.fb.ok{border-color:var(--ok);background:var(--okbg)}
+.fb.bad{border-color:var(--bad);background:var(--badbg)}
+.fb.part{border-color:var(--part);background:var(--partbg)}
+.fb h4{margin:0 0 4px;font-size:15px}
+.fb p{margin:4px 0}
+.fb .ans{font-weight:700}
+.actions{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
+.btn{font:700 15px Arial,sans-serif;border:2px solid var(--ink);background:var(--ink);color:#fff;padding:9px 20px;cursor:pointer}
+.btn.alt{background:#fff;color:var(--ink)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.start{padding:30px 0}
+.start ul{padding-left:20px}
+.res{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px}
+.res th,.res td{border:1px solid #bbb;padding:6px 9px;text-align:left}
+.res th{background:var(--soft)}
+.score{font-size:40px;font-weight:700;margin:6px 0}
+@media(max-width:560px){.wrap{padding:0 14px 40px}.blank{min-width:100px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="school">Biology &middot; Module 5 Heredity &middot; Reproduction</div>
+    <h1>Pregnancy Hormones and the Ovarian Cycle</h1>
+  </header>
+  <div id="app"></div>
+</div>
+<script>
+const IMG = /*IMAGES*/{};
+const ZONES = /*ZONES*/{};
+
+/* ---------- helpers ---------- */
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;};
+const norm=s=>String(s).toLowerCase().replace(/[^a-z0-9.]/g,'');
+function lev(a,b){const d=Array.from({length:a.length+1},(_,i)=>[i]);for(let j=1;j<=b.length;j++)d[0][j]=j;for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[a.length][b.length];}
+const fig=(img,cap)=>`<figure><img src="${IMG[img]}" alt="Stimulus">${cap?`<figcaption>${cap}</figcaption>`:''}</figure>`;
+
+/* ---------- slot game (drag or click chips into slots) ---------- */
+function slotGame(st,n,chips,slotEls,bankEl,render,onChange){
+  st.slots=Array(n).fill(null);let sel=null;const byId={};
+  shuffle(chips).forEach(c=>{
+    const b=el('button','chip');b.textContent=c.text;b.draggable=true;b.type='button';byId[c.id]=b;
+    b.onclick=()=>{if(st.locked)return;let t=(sel!=null&&st.slots[sel]==null)?sel:st.slots.indexOf(null);if(t<0)return;place(t,c.id);};
+    b.ondragstart=e=>{e.dataTransfer.setData('text/plain',c.id);};
+    bankEl.appendChild(b);
+  });
+  function place(i,id){const k=st.slots.indexOf(id);if(k>=0)st.slots[k]=null;st.slots[i]=id;sel=null;draw();}
+  slotEls.forEach((s,i)=>{
+    s.onclick=()=>{if(st.locked)return;if(st.slots[i]!=null){st.slots[i]=null;}else sel=i;draw();};
+    s.ondragover=e=>e.preventDefault();
+    s.ondrop=e=>{e.preventDefault();if(st.locked)return;const id=e.dataTransfer.getData('text/plain');if(id in byId)place(i,id);};
+  });
+  function draw(){
+    chips.forEach(c=>byId[c.id].classList.toggle('used',st.slots.includes(c.id)));
+    slotEls.forEach((s,i)=>{render(s,st.slots[i]==null?null:chips.find(c=>c.id===st.slots[i]),i);s.classList.toggle('sel',sel===i&&st.slots[i]==null);});
+    onChange();
+  }
+  st.lock=()=>{Object.values(byId).forEach(b=>b.disabled=true);};
+  draw();
+}
+
+/* ---------- question types ---------- */
+const TYPES={};
+
+TYPES.mc={
+  mount(box,q,st,onChange){
+    let h='';if(q.img)h+=fig(q.img);box.innerHTML=h;
+    const list=el('div','opts');st.opts=shuffle(q.options);
+    st.opts.forEach((o,i)=>{const b=el('button','opt',`<b>${'ABCD'[i]}.</b><span></span>`);b.type='button';b.lastChild.textContent=o;
+      b.onclick=()=>{if(st.locked)return;st.sel=o;[...list.children].forEach(x=>x.classList.remove('sel'));b.classList.add('sel');onChange();};list.appendChild(b);});
+    box.appendChild(list);st.list=list;
+  },
+  ready:st=>st.sel!=null,
+  grade(q,st){return st.sel===q.answer?1:0;},
+  reveal(q,st){[...st.list.children].forEach((b,i)=>{b.disabled=true;b.classList.remove('sel');const o=st.opts[i];if(o===q.answer)b.classList.add('right');else if(o===st.sel)b.classList.add('wrong');});},
+  answerText:q=>q.answer
+};
+
+TYPES.marker={
+  mount(box,q,st,onChange){
+    const z=ZONES[q.zone];
+    const stage=el('div','stage pick');const img=el('img');img.src=IMG[z.img];img.draggable=false;stage.appendChild(img);
+    const f=el('figure');f.appendChild(stage);f.appendChild(el('figcaption','','Click on the figure to place your marker. Click again to move it.'));box.appendChild(f);
+    st.stage=stage;st.pin=null;
+    stage.onclick=e=>{if(st.locked)return;const r=img.getBoundingClientRect();
+      st.pt={x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height};
+      if(!st.pin){st.pin=el('div','pin','<i></i>');stage.appendChild(st.pin);}
+      st.pin.style.left=st.pt.x*100+'%';st.pin.style.top=st.pt.y*100+'%';onChange();};
+  },
+  ready:st=>!!st.pt,
+  inside(q,p){return ZONES[q.zone].zones.some(([x1,y1,x2,y2])=>p.x>=x1&&p.x<=x2&&p.y>=y1&&p.y<=y2);},
+  grade(q,st){return TYPES.marker.inside(q,st.pt)?1:0;},
+  reveal(q,st){st.stage.classList.remove('pick');
+    ZONES[q.zone].zones.forEach(([x1,y1,x2,y2])=>{const d=el('div','zone');d.style.cssText=`left:${x1*100}%;top:${y1*100}%;width:${(x2-x1)*100}%;height:${(y2-y1)*100}%`;st.stage.appendChild(d);});
+    st.pin.classList.toggle('ok',TYPES.marker.inside(q,st.pt));},
+  answerText:()=>'The green area on the figure shows where the marker should be placed.'
+};
+
+TYPES.order={
+  mount(box,q,st,onChange){
+    let o;do{o=shuffle(q.items);}while(o.join()===q.answer.join());st.order=o;
+    const ul=el('ul','orderlist');st.ul=ul;let drag=null;
+    const draw=()=>{ul.innerHTML='';st.order.forEach((t,i)=>{
+      const li=el('li');li.draggable=!st.locked;li.innerHTML=`<span class="n">${i+1}.</span><span class="t"></span>`;li.querySelector('.t').textContent=t;
+      if(!st.locked){const up=el('button','',' &uarr; '),dn=el('button','',' &darr; ');up.type=dn.type='button';up.title='Move up';dn.title='Move down';
+        up.onclick=()=>{if(i>0){[st.order[i-1],st.order[i]]=[st.order[i],st.order[i-1]];st.moved=1;draw();onChange();}};
+        dn.onclick=()=>{if(i<st.order.length-1){[st.order[i+1],st.order[i]]=[st.order[i],st.order[i+1]];st.moved=1;draw();onChange();}};
+        li.append(up,dn);}
+      li.ondragstart=()=>{drag=i;};
+      li.ondragover=e=>{e.preventDefault();li.classList.add('over');};li.ondragleave=()=>li.classList.remove('over');
+      li.ondrop=e=>{e.preventDefault();if(drag==null||st.locked)return;const [m]=st.order.splice(drag,1);st.order.splice(i,0,m);drag=null;st.moved=1;draw();onChange();};
+      ul.appendChild(li);});};
+    st.draw=draw;draw();box.appendChild(ul);box.appendChild(el('div','hint','Drag the rows, or use the arrows, to put the events in order.'));
+  },
+  ready:st=>true,
+  grade(q,st){return st.order.filter((t,i)=>t===q.answer[i]).length;},
+  reveal(q,st){st.draw();[...st.ul.children].forEach((li,i)=>li.classList.add(st.order[i]===q.answer[i]?'right':'wrong'));},
+  answerText:q=>q.answer.map((t,i)=>`${i+1}. ${t}`).join('  ')
+};
+
+TYPES.match={
+  mount(box,q,st,onChange){
+    const rows=shuffle(q.pairs);st.rows=rows;
+    const t=el('table','match');const slots=[];
+    rows.forEach(p=>{const tr=el('tr');const k=el('td','k');k.textContent=p[0];const v=el('td');const s=el('div','slot');slots.push(s);v.appendChild(s);tr.append(k,v);t.appendChild(tr);});
+    box.appendChild(t);
+    const bank=el('div','chips col');box.appendChild(bank);
+    box.appendChild(el('div','hint','Drag each description into the box beside the correct hormone (or click a description to place it in the next empty box). Click a filled box to remove it.'));
+    st.slotEls=slots;
+    slotGame(st,rows.length,rows.map((p,i)=>({id:'c'+i,text:p[1]})),slots,bank,(s,c)=>{s.textContent=c?c.text:'drop here';s.classList.toggle('full',!!c);},onChange);
+  },
+  ready:st=>st.slots.every(x=>x!=null),
+  grade(q,st){return st.rows.filter((p,i)=>st.slots[i]==='c'+i).length;},
+  reveal(q,st){st.lock();st.locked=true;st.slotEls.forEach((s,i)=>{s.classList.add(st.slots[i]==='c'+i?'right':'wrong');});},
+  answerText:(q)=>q.pairs.map(p=>`${p[0]}: ${p[1]}`).join('; ')
+};
+
+TYPES.fill={
+  mount(box,q,st,onChange){
+    const parts=q.text.split('___');const p=el('div','fillp');const slots=[];
+    parts.forEach((s,i)=>{p.appendChild(document.createTextNode(s));if(i<parts.length-1){const b=el('span','blank');slots.push(b);p.appendChild(b);}});
+    box.appendChild(p);const bank=el('div','chips');box.appendChild(bank);
+    box.appendChild(el('div','hint','Drag words from the word bank into the blanks (or click a word to fill the next empty blank). Click a filled blank to clear it.'));
+    st.slotEls=slots;
+    slotGame(st,slots.length,q.bank.map((w,i)=>({id:'w'+i,text:w})),slots,bank,(s,c)=>{s.textContent=c?c.text:' ';},onChange);
+    st.chips=q.bank.map((w,i)=>({id:'w'+i,text:w}));
+  },
+  ready:st=>st.slots.every(x=>x!=null),
+  grade(q,st){return q.answer.filter((a,i)=>st.chips.find(c=>c.id===st.slots[i]).text===a).length;},
+  reveal(q,st){st.lock();st.locked=true;st.slotEls.forEach((s,i)=>s.classList.add(st.chips.find(c=>c.id===st.slots[i]).text===q.answer[i]?'right':'wrong'));},
+  answerText:q=>q.answer.map((a,i)=>`(${i+1}) ${a}`).join(', ')
+};
+
+TYPES.typed={
+  mount(box,q,st,onChange){
+    if(q.img)box.insertAdjacentHTML('beforeend',fig(q.img));
+    const inp=el('input','typed');inp.type='text';inp.placeholder=q.num?'Type a number':'Type one word';inp.autocomplete='off';inp.spellcheck=false;
+    inp.oninput=()=>{st.val=inp.value;onChange();};
+    inp.onkeydown=e=>{if(e.key==='Enter'&&!st.locked&&st.val&&st.val.trim()){document.getElementById('check').click();}};
+    box.appendChild(inp);st.inp=inp;st.val='';setTimeout(()=>inp.focus(),30);
+  },
+  ready:st=>!!(st.val&&st.val.trim()),
+  isRight(q,v){let n=norm(v);if(q.num)n=n.replace(/days?|day|wks?|weeks?/g,'');return q.accept.some(a=>{a=norm(a);return n===a||(a.length>=7&&lev(n,a)<=1);});},
+  grade(q,st){return TYPES.typed.isRight(q,st.val)?1:0;},
+  reveal(q,st){st.inp.disabled=true;st.inp.style.borderColor=TYPES.typed.isRight(q,st.val)?'var(--ok)':'var(--bad)';st.inp.style.borderWidth='2px';},
+  answerText:q=>q.accept[0]
+};
+
+/* ---------- question bank (converted from existing bank questions) ---------- */
+const BANK=[
+{id:'hornsby',type:'mc',marks:1,title:'Hormones X, Y and Z',
+ prompt:'The secretion of specific hormones is carefully regulated during the ovulation cycle to prepare the uterus for the implantation of an embryo. After ovulation the corpus luteum enlarges and starts to secrete hormones X and Y. If fertilisation and implantation occur, the pregnancy is controlled by hormone Y, secreted from the corpus luteum in the first three months and later from the placenta. Hormone Z controls birth by causing coordinated contractions of uterine muscles. What are hormones X, Y and Z respectively?',
+ options:['Oestradiol, oxytocin, progesterone','Oxytocin, oestradiol, progesterone','Oestradiol, progesterone, oxytocin','Prolactin, progesterone, oxytocin'],
+ answer:'Oestradiol, progesterone, oxytocin',
+ expl:'The corpus luteum secretes oestradiol and progesterone. Progesterone maintains the pregnancy (from the corpus luteum, then the placenta). Oxytocin causes the coordinated uterine contractions of birth.'},
+
+{id:'m-impl',type:'marker',marks:1,zone:'impl-diagram',
+ prompt:'The diagram shows the human female reproductive system. Place a marker on the diagram at the structure where implantation normally occurs.',
+ expl:'Implantation occurs when the embryo embeds in the endometrium, the lining of the uterus. The oviducts are where fertilisation usually occurs, and the ovaries are where follicles and the corpus luteum are found.'},
+
+{id:'m-bleed',type:'marker',marks:1,zone:'bleed-day',
+ prompt:'The graph shows progesterone and luteinising hormone (LH) levels in a woman’s blood over 40 days. Progesterone rises after ovulation and then falls sharply as the corpus luteum breaks down if pregnancy does not occur. Place a marker on the graph at the time her menstrual bleed started.',
+ expl:'Progesterone falls to its baseline at about day 21 as the corpus luteum breaks down. Without progesterone the endometrium cannot be maintained, so it breaks down and menstrual bleeding begins.'},
+
+{id:'m-impl-wk',type:'marker',marks:1,zone:'impl-week',
+ prompt:'The graph shows the blood levels of oestrogen, progesterone and human chorionic gonadotrophin (HCG) in a woman during pregnancy, measured in weeks since the end of her last menstrual cycle. HCG is only produced once the embryo has implanted. Place a marker on the graph at the time implantation occurred.',
+ expl:'HCG begins to be produced once implantation has occurred, so the point where HCG levels first rise (about week 4) shows when the embryo implanted.'},
+
+{id:'order',type:'order',marks:4,
+ prompt:'The following events occur during reproduction in a placental mammal. Place them in the order in which they occur.',
+ items:['Fertilisation','Implantation','Ovulation','Placental formation'],
+ answer:['Ovulation','Fertilisation','Implantation','Placental formation'],
+ expl:'An egg is released at ovulation and fertilised in the oviduct. The embryo then implants in the endometrium, and the placenta develops from embryonic and maternal tissue.'},
+
+{id:'match',type:'match',marks:4,
+ prompt:'Match each hormone to its function in the menstrual cycle, pregnancy and birth.',
+ pairs:[['Luteinising hormone (LH)','A sharp surge triggers release of the egg from the follicle (ovulation)'],
+        ['hCG','Produced after implantation; supports the corpus luteum so it keeps producing progesterone'],
+        ['Oxytocin','Stimulates contractions of the uterus during childbirth'],
+        ['Prolactin','Stimulates milk production in the mammary glands after birth']],
+ expl:'LH surge: ovulation. hCG: keeps the corpus luteum (and so progesterone) going in early pregnancy. Oxytocin: labour contractions. Prolactin: lactation.'},
+
+{id:'fillA',type:'fill',marks:3,
+ prompt:'Complete the passage using the word bank.',
+ text:'In a typical menstrual cycle, ovulation occurs at approximately day ___, triggered by a surge in ___. The follicle then becomes the corpus luteum, which secretes oestrogen and ___.',
+ bank:['14','28','luteinising hormone','follicle stimulating hormone','progesterone','oxytocin','prolactin'],
+ answer:['14','luteinising hormone','progesterone'],
+ expl:'Ovulation occurs at about day 14 after an LH surge. The remaining follicle becomes the corpus luteum, which secretes progesterone and oestrogen.'},
+
+{id:'fillB',type:'fill',marks:3,
+ prompt:'Complete the passage using the word bank.',
+ text:'If an egg is fertilised, progesterone and oestrogen are initially maintained by the ___, which is kept active by the hormone ___ produced by the embryo. Later, once it has developed, the ___ takes over as the main source of both hormones.',
+ bank:['corpus luteum','placenta','hCG','pituitary gland','hypothalamus','prolactin','oxytocin'],
+ answer:['corpus luteum','hCG','placenta'],
+ expl:'Early in pregnancy hCG from the embryo keeps the corpus luteum secreting progesterone and oestrogen. From about week 5 to 12 the placenta takes over as the main source.'},
+
+{id:'t-oxy',type:'typed',marks:1,
+ prompt:'The hormone that plays a key role in triggering and maintaining contractions of the uterus during childbirth is ______ (one word).',
+ accept:['oxytocin'],
+ expl:'Oxytocin stimulates uterine contractions during labour. It is part of a positive feedback loop: contractions cause more oxytocin release, which causes stronger contractions.'},
+
+{id:'t-prog',type:'typed',marks:1,
+ prompt:'The primary hormone secreted by the corpus luteum is ______ (one word).',
+ accept:['progesterone'],
+ expl:'The corpus luteum mainly secretes progesterone (plus some oestrogen) to maintain the endometrium for implantation.'},
+
+{id:'t-lh',type:'typed',marks:1,num:true,img:'cycle',
+ prompt:'Read the graph. On which day does the LH curve (dashed line) reach its highest point? (Type a number only.)',
+ accept:['5'],
+ expl:'The dashed LH curve peaks at about day 5 (and again at about day 36, the start of the next cycle).'},
+
+{id:'i-sb2020',type:'mc',marks:1,img:'sb2020',
+ prompt:'The graph shows three pregnancy hormones. Progesterone is labelled. One other curve rises steadily throughout pregnancy in a similar trend to progesterone, while the third curve spikes sharply around 8 to 10 weeks before declining to a plateau. Identify these two hormones.',
+ options:['The steadily-rising curve is oestrogen; the early-spiking curve is hCG (human chorionic gonadotropin)','The steadily-rising curve is hCG; the early-spiking curve is oestrogen','Both curves represent oestrogen at different stages','The early-spiking curve is progesterone, and progesterone is mislabeled on the graph'],
+ answer:'The steadily-rising curve is oestrogen; the early-spiking curve is hCG (human chorionic gonadotropin)',
+ expl:'Oestrogen rises steadily alongside progesterone as the placenta produces more. hCG peaks early, soon after implantation, then falls as the placenta takes over hormone production.'},
+
+{id:'i-nsg',type:'mc',marks:1,img:'nsg2020',
+ prompt:'The graph shows progesterone from the placenta only rising from about week 5 post-fertilisation onwards. Why is progesterone not produced by the placenta before this point?',
+ options:['The placenta itself has not yet formed by that point, it typically forms at around 5 weeks; before then, progesterone is instead produced by the corpus luteum','Progesterone is not needed for the first 5 weeks of pregnancy','The embryo actively blocks progesterone production until week 5','Progesterone can only be produced after the baby’s own hormone glands have formed'],
+ answer:'The placenta itself has not yet formed by that point, it typically forms at around 5 weeks; before then, progesterone is instead produced by the corpus luteum',
+ expl:'The placenta does not form until about week 5. Until then the corpus luteum, supported by hCG, provides the progesterone that maintains the pregnancy.'},
+
+{id:'p-hcg',type:'mc',marks:1,img:'sb2023',
+ prompt:'The graph shows progesterone, oestrogen and hormone X over a pregnancy. Hormone X is produced by the embryo after implantation and rises sharply in the first two months. Predict what would most likely happen if hormone X were not produced.',
+ options:['The corpus luteum would not be maintained, so progesterone would fall early in pregnancy and the endometrium could not be maintained','Progesterone would rise faster, because nothing would limit its release','Labour contractions would begin in the first month of pregnancy','Milk production would begin early in pregnancy'],
+ answer:'The corpus luteum would not be maintained, so progesterone would fall early in pregnancy and the endometrium could not be maintained',
+ expl:'Hormone X (hCG) signals the corpus luteum to keep secreting progesterone until the placenta takes over. Without it the corpus luteum would break down, progesterone would fall and the pregnancy could not be maintained.'},
+
+{id:'i-fb',type:'mc',marks:1,img:'oxytocin',
+ prompt:'The diagram shows the effect of the hormone oxytocin on the uterus during birth: contractions push the foetus against the cervix, receptors there signal the brain, and more oxytocin is released, causing stronger contractions. Why is this an example of positive feedback rather than negative feedback?',
+ options:['The response (more contractions) amplifies the original stimulus rather than reducing it, driving the process forward to a conclusion (birth) rather than back to a stable set point','Positive feedback loops always involve two different hormones acting at once','The response reduces the stimulus back towards a stable set point, which is the definition of positive feedback','Oxytocin is only ever involved in negative feedback loops'],
+ answer:'The response (more contractions) amplifies the original stimulus rather than reducing it, driving the process forward to a conclusion (birth) rather than back to a stable set point',
+ expl:'In positive feedback the response increases the stimulus. Contractions cause oxytocin release, which causes stronger contractions, until birth ends the loop.'}
+];
+
+const TYPELABEL={mc:'Multiple choice',marker:'Place a marker on the figure',order:'Put in order',match:'Match',fill:'Fill in the blanks',typed:'Short answer'};
+
+/* ---------- quiz engine ---------- */
+const app=document.getElementById('app');
+let run=null;
+
+function start(){
+  app.innerHTML=`<div class="start"><p>This quiz has <b>${BANK.length} questions</b> and takes about 10 to 15 minutes. Questions appear in a random order.</p>
+  <ul><li>Select <b>Check answer</b> to see whether you are correct. The correct answer and an explanation are then shown.</li>
+  <li>If you are not fully correct, you may choose <b>Try again</b>. Your score is based on your <b>first attempt</b> only.</li>
+  <li>Some questions give part marks.</li></ul>
+  <div class="actions"><button class="btn" id="go">Begin</button></div></div>`;
+  document.getElementById('go').onclick=()=>{run={order:shuffle(BANK),i:0,res:[]};show();};
+}
+
+function show(){
+  const q=run.order[run.i];const T=TYPES[q.type];const st={locked:false};
+  const total=run.order.reduce((s,x)=>s+x.marks,0);
+  app.innerHTML=`<div class="meta"><span>Question ${run.i+1} of ${run.order.length}</span><span>Total marks: ${total}</span></div><div class="bar"><i style="width:${run.i/run.order.length*100}%"></i></div>
+  <div class="qhead"><b>Question ${run.i+1}</b><span>${q.marks} mark${q.marks>1?'s':''}</span></div>
+  <div class="type">${TYPELABEL[q.type]}</div><p class="prompt" id="pr"></p><div id="box"></div><div id="fbx"></div>
+  <div class="actions"><button class="btn" id="check" disabled>Check answer</button></div>`;
+  document.getElementById('pr').textContent=q.prompt;
+  const box=document.getElementById('box'),chk=document.getElementById('check');
+  if(q.type==='fill'){document.getElementById('pr').textContent=q.prompt;}
+  const onChange=()=>{chk.disabled=st.locked||!T.ready(st);};
+  if(q.type==='typed'&&q.img){/* image shown by mount */}
+  T.mount(box,q,st,onChange);onChange();
+  const first=run.res[run.i]===undefined;
+  chk.onclick=()=>{
+    if(st.locked||!T.ready(st))return;
+    st.locked=true;const m=T.grade(q,st);
+    if(run.res[run.i]===undefined)run.res[run.i]={q,marks:m,tries:1};else run.res[run.i].tries++;
+    T.reveal(q,st);
+    const cls=m===q.marks?'ok':m>0?'part':'bad';
+    const head=m===q.marks?'Correct':m>0?`Partly correct: ${m} of ${q.marks} marks`:'Incorrect';
+    const fb=document.getElementById('fbx');
+    fb.innerHTML=`<div class="fb ${cls}"><h4>${head}</h4>${m<q.marks?`<p><span class="ans">Correct answer:</span> <span id="ca"></span></p>`:''}<p id="ex"></p></div>`;
+    if(m<q.marks)document.getElementById('ca').textContent=T.answerText(q);
+    document.getElementById('ex').textContent=q.expl;
+    chk.remove();
+    const acts=document.querySelector('.actions');
+    if(m<q.marks){const r=el('button','btn alt','Try again');r.onclick=()=>show.retry();acts.appendChild(r);}
+    const last=run.i===run.order.length-1;
+    const n=el('button','btn',last?'Finish':'Next question');n.onclick=()=>{if(last)finish();else{run.i++;show();}};acts.appendChild(n);
+    n.focus();
+  };
+  show.retry=()=>{
+    const keep=run.res[run.i];show();
+    run.res[run.i]=keep;
+  };
+}
+
+function finish(){
+  const total=run.order.reduce((s,x)=>s+x.marks,0),got=run.res.reduce((s,r)=>s+r.marks,0);
+  const pct=Math.round(got/total*100);
+  let rows='';run.res.forEach((r,i)=>{rows+=`<tr><td>${i+1}</td><td>${TYPELABEL[r.q.type]}</td><td>${r.marks} / ${r.q.marks}</td><td>${r.tries>1?'Retried ('+r.tries+' attempts)':''}</td></tr>`;});
+  app.innerHTML=`<div class="start"><div class="type">Quiz complete</div><div class="score">${got} / ${total}</div><p>${pct}% on first attempts.</p>
+  <table class="res"><tr><th>Q</th><th>Type</th><th>First-attempt marks</th><th></th></tr>${rows}</table>
+  <div class="actions"><button class="btn" id="again">Start again (new random order)</button></div></div>`;
+  document.getElementById('again').onclick=start;
+}
+start();
+</script>
+</body>
+</html>

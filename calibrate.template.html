@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marker Zone Calibrator</title>
+<style>
+body{margin:0;font:15px/1.5 Arial,Helvetica,sans-serif;color:#111;background:#fff}
+.wrap{max-width:980px;margin:0 auto;padding:20px}
+h1{font-size:22px;margin:0 0 4px}
+p.sub{color:#555;margin:0 0 16px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+select,button{font:inherit;padding:7px 12px;border:1px solid #222;background:#fff;cursor:pointer}
+button.pri{background:#111;color:#fff}
+.stage{position:relative;display:inline-block;line-height:0;border:1px solid #222;cursor:crosshair;user-select:none}
+.stage img{display:block;max-width:100%;max-height:560px;-webkit-user-drag:none}
+.z{position:absolute;border:2px solid #1d6b2f;background:rgba(29,107,47,.22)}
+.z b{position:absolute;top:-1px;left:-1px;background:#1d6b2f;color:#fff;font:12px/16px Arial;padding:0 5px}
+.z.draft{border-style:dashed}
+.test{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border:2px solid #a1241c;border-radius:50%;pointer-events:none}
+ul{padding-left:18px}
+li{margin:4px 0}
+textarea{width:100%;height:150px;font:12px/1.4 Consolas,monospace}
+.mode label{margin-right:14px}
+.read{font-size:13px;color:#555;min-height:20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Marker Zone Calibrator</h1>
+  <p class="sub">Choose a marker question, then drag a rectangle on the figure over the area a student must click to be marked correct. Add as many rectangles as you need (any one counts). Then download <b>zones.json</b>, put it in the project folder and run <code>node build.js</code>.</p>
+  <div class="row">
+    <select id="sel"></select>
+    <button id="clear">Clear this question's zones</button>
+    <span class="mode"><label><input type="radio" name="m" value="draw" checked> Draw zone</label><label><input type="radio" name="m" value="test"> Test click (see if it lands inside)</label></span>
+  </div>
+  <div class="read" id="read"></div>
+  <div class="stage" id="stage"><img id="img" draggable="false"></div>
+  <h3>Zones for this question</h3>
+  <ul id="list"></ul>
+  <div class="row">
+    <button class="pri" id="dl">Download zones.json</button>
+    <button id="copy">Copy JSON</button>
+    <label>Load existing zones.json: <input type="file" id="file" accept=".json"></label>
+  </div>
+  <textarea id="out" readonly></textarea>
+</div>
+<script>
+const IMG = /*IMAGES*/{};
+let Z = /*ZONES*/{};
+try{const s=localStorage.getItem('zones-draft');if(s)Z=Object.assign(Z,JSON.parse(s));}catch(e){}
+const $=id=>document.getElementById(id);
+const sel=$('sel'),img=$('img'),stage=$('stage');
+Object.keys(Z).forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=Z[k].label;sel.appendChild(o);});
+let cur=sel.value,drag=null,mode='draw';
+document.querySelectorAll('input[name=m]').forEach(r=>r.onchange=()=>{mode=r.value;});
+function load(){cur=sel.value;img.src=IMG[Z[cur].img];draw();}
+function save(){try{localStorage.setItem('zones-draft',JSON.stringify(Z));}catch(e){}}
+function draw(){
+  stage.querySelectorAll('.z,.test').forEach(n=>n.remove());
+  Z[cur].zones.forEach((z,i)=>{const d=document.createElement('div');d.className='z';d.style.cssText=`left:${z[0]*100}%;top:${z[1]*100}%;width:${(z[2]-z[0])*100}%;height:${(z[3]-z[1])*100}%`;d.innerHTML='<b>'+(i+1)+'</b>';stage.appendChild(d);});
+  const ul=$('list');ul.innerHTML='';
+  Z[cur].zones.forEach((z,i)=>{const li=document.createElement('li');li.textContent=`Zone ${i+1}: x ${z[0].toFixed(3)}-${z[2].toFixed(3)}, y ${z[1].toFixed(3)}-${z[3].toFixed(3)} `;const b=document.createElement('button');b.textContent='Delete';b.onclick=()=>{Z[cur].zones.splice(i,1);save();draw();};li.appendChild(b);ul.appendChild(li);});
+  $('out').value=JSON.stringify(Z,null,2);save();
+}
+function pos(e){const r=img.getBoundingClientRect();return {x:Math.min(1,Math.max(0,(e.clientX-r.left)/r.width)),y:Math.min(1,Math.max(0,(e.clientY-r.top)/r.height))};}
+stage.onmousedown=e=>{e.preventDefault();const p=pos(e);
+  if(mode==='test'){stage.querySelectorAll('.test').forEach(n=>n.remove());const t=document.createElement('div');t.className='test';t.style.left=p.x*100+'%';t.style.top=p.y*100+'%';stage.appendChild(t);
+    const hit=Z[cur].zones.some(z=>p.x>=z[0]&&p.x<=z[2]&&p.y>=z[1]&&p.y<=z[3]);$('read').textContent=`Test click at x ${p.x.toFixed(3)}, y ${p.y.toFixed(3)}: ${hit?'INSIDE a zone (correct)':'outside all zones (incorrect)'}`;return;}
+  drag=p;const d=document.createElement('div');d.className='z draft';stage.appendChild(d);drag.el=d;};
+window.onmousemove=e=>{const p=pos(e);if(mode==='draw')$('read').textContent=`x ${p.x.toFixed(3)}, y ${p.y.toFixed(3)}`;
+  if(!drag)return;const x1=Math.min(drag.x,p.x),y1=Math.min(drag.y,p.y),x2=Math.max(drag.x,p.x),y2=Math.max(drag.y,p.y);drag.el.style.cssText=`left:${x1*100}%;top:${y1*100}%;width:${(x2-x1)*100}%;height:${(y2-y1)*100}%`;};
+window.onmouseup=e=>{if(!drag)return;const p=pos(e);const x1=Math.min(drag.x,p.x),y1=Math.min(drag.y,p.y),x2=Math.max(drag.x,p.x),y2=Math.max(drag.y,p.y);drag.el.remove();drag=null;
+  if(x2-x1>0.005&&y2-y1>0.005){Z[cur].zones.push([+x1.toFixed(4),+y1.toFixed(4),+x2.toFixed(4),+y2.toFixed(4)]);draw();}};
+sel.onchange=load;
+$('clear').onclick=()=>{Z[cur].zones=[];draw();};
+$('dl').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(Z,null,2)],{type:'application/json'}));a.download='zones.json';a.click();};
+$('copy').onclick=()=>{$('out').select();document.execCommand('copy');};
+$('file').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{Z=Object.assign(Z,JSON.parse(t));draw();});};
+img.onload=draw;load();
+</script>
+</body>
+</html>
